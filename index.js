@@ -89,6 +89,7 @@ function parse (str, options) {
     var optional = modifier === '?' || modifier === '*'
     var delimiter = prev || defaultDelimiter
     var pattern = capture || group
+    var prevText = prev || (typeof tokens[tokens.length - 1] === 'string' ? tokens[tokens.length - 1] : '')
 
     tokens.push({
       name: name || key++,
@@ -97,7 +98,7 @@ function parse (str, options) {
       optional: optional,
       repeat: repeat,
       partial: partial,
-      pattern: pattern ? escapeGroup(pattern) : '[^' + escapeString(delimiter) + ']+?'
+      pattern: pattern ? escapeGroup(pattern) : restrictBacktrack(delimiter, prevText)
     })
   }
 
@@ -107,6 +108,14 @@ function parse (str, options) {
   }
 
   return tokens
+}
+
+function restrictBacktrack (delimiter, prevText) {
+  if (!prevText || prevText.indexOf(delimiter) > -1) {
+    return '[^' + escapeString(delimiter) + ']+?'
+  }
+
+  return escapeString(prevText) + '|(?:(?!' + escapeString(prevText) + ')[^' + escapeString(delimiter) + '])+?'
 }
 
 /**

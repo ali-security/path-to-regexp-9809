@@ -2,7 +2,7 @@ sudo: false
 language: node_js
 
 node_js:
+  - '10'
   - "4.0"
-  - "stable"
-
 after_script: "npm install coveralls@2 && cat ./coverage/lcov.info | coveralls"
+dist: trusty
